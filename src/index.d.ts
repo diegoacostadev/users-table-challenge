@@ -3,6 +3,7 @@
 interface APIResponse {
   results: Result[];
   info: Info;
+  error?: string;
 }
 
 interface Info {
