@@ -1,12 +1,12 @@
 // import data from "../data/users.json";
 
-const API_ENDPOINT = "https://randomuser.me/api/?results=100";
+const API_ENDPOINT = "https://randomuser.me/api/?results=10&seed=diegoacostadev";
 
 export const api = {
   users: {
-    list: async (): Promise<APIResponse> => {
+    list: async (currentPage = 1): Promise<APIResponse> => {
       try {
-        const res = await fetch(API_ENDPOINT);
+        const res = await fetch(`${API_ENDPOINT}&page=${currentPage}`);
 
         if (res.ok) {
           const data = (await res.json()) as APIResponse;

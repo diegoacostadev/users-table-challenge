@@ -65,14 +65,14 @@ export default function UserTable({users, showColoredRows, onDelete, changeSort}
       </thead>
       <tbody>
         {users?.map((user) => (
-          <tr key={user.id.value + user.cell}>
+          <tr key={user?.id?.value + user?.cell}>
             <td style={cellStyles}>
-              <img alt={user.name.first} src={user.picture.thumbnail} />
+              <img alt={user?.name?.first} src={user?.picture?.thumbnail} />
             </td>
-            <td style={cellStyles}>{user.name.first}</td>
-            <td style={cellStyles}>{user.name.last}</td>
-            <td style={cellStyles}>{user.location.country}</td>
-            <td style={cellStyles} onClick={() => onDelete({id: user.id.value})}>
+            <td style={cellStyles}>{user?.name?.first}</td>
+            <td style={cellStyles}>{user?.name?.last}</td>
+            <td style={cellStyles}>{user?.location?.country}</td>
+            <td style={cellStyles} onClick={() => onDelete({id: user?.id?.value})}>
               <button>Delete</button>
             </td>
           </tr>

@@ -1,44 +1,30 @@
+import {useState} from "react";
+
 import UserTable from "./components/UserTable";
 import SearchBar from "./components/SearchBar";
 import useFilters from "./hooks/userFilters";
-import Pagination from "./components/Pagination";
-import usePagination from "./hooks/usePagination";
+import useUsers from "./hooks/useUsers";
 
-const PAGE_SIZE = 10;
+const INITIAL_PAGE = 1;
 
 function App() {
+  // const page = 1;
+  const [page, setPage] = useState(INITIAL_PAGE);
+  const {rawUsers, loading, error} = useUsers({page});
+
   const {
     handleSort,
     showColoredRows,
-    users: sorted,
+    users,
     handleDelete,
     handleColoredRows,
     handleOrderedByCountry,
     handleSearch,
     restoreToInitialState,
     search,
-  } = useFilters();
+  } = useFilters({usersRef: rawUsers});
 
-  const {
-    paginationNumbers,
-    getRange,
-    page,
-    changePage,
-    goToFirst,
-    goToLast,
-    prevPage,
-    nextPage,
-    isPrevDisabled,
-    isNextDisabled,
-  } = usePagination({
-    initialPage: 0,
-    pageSize: PAGE_SIZE,
-    totalCount: sorted.length,
-  });
-
-  const [initial, end] = getRange();
-
-  const users = sorted.slice(initial, end);
+  // const users = sorted.slice(initial, end);
 
   return (
     <>
@@ -49,23 +35,22 @@ function App() {
         restoreToInitialState={restoreToInitialState}
         search={search}
       />
-      <UserTable
-        changeSort={handleSort}
-        showColoredRows={showColoredRows}
-        users={users}
-        onDelete={handleDelete}
-      />
-      <Pagination
-        changePage={changePage}
-        current={page}
-        goToFirst={goToFirst}
-        goToLast={goToLast}
-        isNextDisabled={isNextDisabled}
-        isPrevDisabled={isPrevDisabled}
-        nextPage={nextPage}
-        paginationNumbers={paginationNumbers}
-        prevPage={prevPage}
-      />
+
+      {users?.length && (
+        <>
+          <UserTable
+            changeSort={handleSort}
+            showColoredRows={showColoredRows}
+            users={users}
+            onDelete={handleDelete}
+          />
+        </>
+      )}
+      {page}
+      <button onClick={() => setPage(page + 1)}>Load more</button>
+      {loading && <p>Loading...</p>}
+      {!loading && error && <p>There was an error.</p>}
+      {!loading && !error && users?.length == 0 && <p>No users found.</p>}
     </>
   );
 }

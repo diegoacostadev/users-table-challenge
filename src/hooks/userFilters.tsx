@@ -1,24 +1,20 @@
-import {SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {InfiniteData} from "@tanstack/react-query";
+import {SyntheticEvent, useCallback, useEffect, useMemo, useState} from "react";
 
-import {api} from "../services/api";
-
-export default function useFilters() {
-  const usersRef = useRef<Result[]>([]);
-  const [originalUsers, setOriginalUsers] = useState<Result[]>([]);
+export default function useFilters({usersRef}: {usersRef: Result[] | undefined}) {
+  const [originalUsers, setOriginalUsers] = useState(usersRef);
   const [showColoredRows, setShowColoredRows] = useState(false);
   const [orderedByCountry, setOrderedByCountry] = useState(false);
   const [sort, setSort] = useState<Sort>({
     type: "asc",
     value: "none",
   });
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    api.users.list().then((data) => {
-      usersRef.current = data.results;
-      setOriginalUsers(data.results);
-    });
-  }, []);
+    setOriginalUsers(usersRef);
+  }, [usersRef]);
+
+  const [search, setSearch] = useState("");
 
   const handleColoredRows = () => {
     setShowColoredRows(!showColoredRows);
@@ -29,7 +25,7 @@ export default function useFilters() {
   };
 
   const filteredUsers = useMemo(() => {
-    console.log("filter users");
+    if (!originalUsers) return;
     let draft = Array.from(originalUsers);
 
     if (search) {
@@ -59,7 +55,7 @@ export default function useFilters() {
   }, []);
 
   const users = useMemo(() => {
-    console.log("sort");
+    if (!filteredUsers) return;
     let draft = Array.from(filteredUsers);
 
     if (sort.value != "none") {
@@ -85,13 +81,14 @@ export default function useFilters() {
   };
 
   const handleDelete = ({id}: {id: string | null}) => {
+    if (!originalUsers) return;
     const draft = originalUsers.filter((u) => u.id.value !== id);
 
     setOriginalUsers(draft);
   };
 
   const restoreToInitialState = () => {
-    setOriginalUsers(usersRef.current);
+    setOriginalUsers(usersRef);
   };
 
   const handleSearch = (e: SyntheticEvent<HTMLInputElement>) => {
@@ -101,7 +98,6 @@ export default function useFilters() {
   };
 
   return {
-    usersRef: usersRef.current,
     users,
     search,
     handleColoredRows,
